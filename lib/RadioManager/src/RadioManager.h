@@ -9,6 +9,7 @@
 #include <mbedtls/entropy.h>
 #include <Base64.h>
 #include <SimpleCha2.h>
+#include <ArduinoJson.h>
 
 // Ajoutez cette ligne
 using Bytes = std::vector<uint8_t>;
@@ -76,6 +77,11 @@ public:
     bool generateX25519SharedKey(const uint8_t* peerPublicKey, const uint8_t* privateKey, uint8_t* sharedKey);
     
     ~RadioManager(); // Destructor declaration
+
+    // Nouvelles fonctions
+    String exportCfg();
+    bool importCfg(const String& jsonConfig);
+    String getPairedKeys();
 
 private:
 

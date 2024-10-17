@@ -5,6 +5,7 @@
 #include <mbedtls/ctr_drbg.h>
 #include <Base64.h>
 #include <SimpleCha2.h>
+#include <ArduinoJson.h>
 
 
 #define RADIO_MANAGER_DEBUG
@@ -1257,4 +1258,82 @@ void RadioManager::enable(bool en) {
         // Resume radio listening
         radio.begin();
     }
+}
+
+String RadioManager::exportCfg() {
+    DynamicJsonDocument doc(2048);  // Ajustez la taille selon vos besoins
+
+    // Exporter pairedAddr
+    doc["pairedAddr"] = getPairedAddrList();
+
+    // Exporter pairedKeys
+    doc["pairedKeys"] = getPairedKeys();
+
+    // Exporter personalKeys
+    Bytes pubKey, privKey;
+    getPersonalKeys(pubKey, privKey);
+    doc["personalKeys"]["publicKey"] = Base64::encode(pubKey.data(), pubKey.size());
+    doc["personalKeys"]["privateKey"] = Base64::encode(privKey.data(), privKey.size());
+
+    String output;
+    serializeJson(doc, output);
+    return output;
+}
+
+bool RadioManager::importCfg(const String& jsonConfig) {
+    DynamicJsonDocument doc(2048);  // Ajustez la taille selon vos besoins
+    DeserializationError error = deserializeJson(doc, jsonConfig);
+
+    if (error) {
+        return false;
+    }
+
+    // Importer personalKeys
+    if (doc.containsKey("personalKeys")) {
+        String pubKeyStr = doc["personalKeys"]["publicKey"];
+        String privKeyStr = doc["personalKeys"]["privateKey"];
+        Bytes pubKey, privKey;
+        Base64::decode(pubKeyStr, pubKey);
+        Base64::decode(privKeyStr, privKey);
+        setPersonalKeys(pubKey, privKey);
+    }
+
+    // Importer pairedAddr
+    if (doc.containsKey("pairedAddr")) {
+        String pairedAddrList = doc["pairedAddr"].as<String>();
+        setPairedAddrList(pairedAddrList);
+    }
+
+    // Importer pairedKeys
+    if (doc.containsKey("pairedKeys")) {
+        JsonObject pairedKeys = doc["pairedKeys"];
+        for (JsonPair kv : pairedKeys) {
+            uint8_t channel = atoi(kv.key().c_str());
+            if (channel < MAX_CHANNELS) {
+                String pubKeyStr = kv.value()["publicKey"];
+                String sharedKeyStr = kv.value()["sharedKey"];
+                Bytes pubKey, sharedKey;
+                Base64::decode(pubKeyStr, pubKey);
+                Base64::decode(sharedKeyStr, sharedKey);
+                setPairedKeys(channel, pubKey, sharedKey);
+            }
+        }
+    }
+
+    return true;
+}
+
+String RadioManager::getPairedKeys() {
+    DynamicJsonDocument doc(1024);  // Ajustez la taille selon vos besoins
+
+    for (uint8_t channel = 0; channel < MAX_CHANNELS; channel++) {
+        if (!pairedDevices[channel].addr.isEmpty()) {
+            doc[String(channel)]["publicKey"] = Base64::encode(pairedDevices[channel].publicKey, KEY_SIZE);
+            doc[String(channel)]["sharedKey"] = Base64::encode(pairedDevices[channel].sharedKey, KEY_SIZE);
+        }
+    }
+
+    String output;
+    serializeJson(doc, output);
+    return output;
 }
