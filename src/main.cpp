@@ -14,7 +14,6 @@ const char* RADIO_ID = getESP32UID();
 // Pin definitions
 #define CE_PIN D2
 #define CSN_PIN D7
-#define BUTTON_PIN D1
 
 // Create RadioManager instance
 RadioManager radioManager(CE_PIN, CSN_PIN, RADIO_ID);
@@ -48,7 +47,10 @@ void setup() {
     Serial.println(radioManager.getRadioID());
 
     // Restore configuration after reboot
-    retrieveCfg();
+    if (!retrieveCfg()) {
+        Serial.println("Failed to retrieve configuration, using default settings");
+        // Vous pouvez ajouter ici un code pour gérer l'échec de la récupération de la configuration
+    }
 }
 
 void loop() {
@@ -57,28 +59,22 @@ void loop() {
 
     // Check current state
     if (radioManager.isAvailable()) {
-        // Handle button for pairing
+
+        // Process radio data
         handleButton();
-
-        // Check message sending status
         checkSendingStatus();
-
-        // Read messages
         readMessages();
-
-        // Send serial messages
         sendSerialMessage();
 
         // Check if pairing has been done and save the configuration
-        static String lastPairedAddrList = radioManager.getPairedAddrList();
         String currentPairedAddrList = radioManager.getPairedAddrList();
-        if (currentPairedAddrList != lastPairedAddrList) {
-            saveCfg();
-            lastPairedAddrList = currentPairedAddrList;
+        if (currentPairedAddrList != lastSavedPairedAddrList) {
+            if (!saveCfg()) {
+                Serial.println("Failed to save configuration");
+                lastSavedPairedAddrList = currentPairedAddrList;
+            }
         }
     }
 
-    // LED blinking code (commented out for now)
-    // updateLed();
-    // ... (rest of the LED blinking code)
+    updateLed();
 }

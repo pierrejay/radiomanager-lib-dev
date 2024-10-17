@@ -14,6 +14,9 @@ bool lastButtonState = HIGH;
 unsigned long buttonPressStartTime = 0;
 const unsigned long PAIRING_BUTTON_DURATION = 1000; // 1 second
 
+// Radio variables
+String lastSavedPairedAddrList = "";
+
 // Message sending variables
 uint8_t currentChannel = 0;
 uint8_t messageStatus = 0;
@@ -80,38 +83,50 @@ void updateLed() {
 }
 
 // Function to save the configuration
-void saveCfg() {
+bool saveCfg() {
     String cfg = radioManager.exportCfg();
     File file = SPIFFS.open(CONFIG_FILE, FILE_WRITE);
     if (!file) {
         Serial.println("Failed to open file for writing");
-        return;
+        return false;
     }
-    file.print(cfg);
+    size_t bytesWritten = file.print(cfg);
     file.close();
-    Serial.println("Configuration saved");
+    if (bytesWritten == cfg.length()) {
+        Serial.println("Configuration saved successfully");
+        lastSavedPairedAddrList = radioManager.getPairedAddrList();
+        return true;
+    } else {
+        Serial.println("Failed to save configuration");
+        return false;
+    }
 }
 
 // Function to restore the configuration
-void retrieveCfg() {
+bool retrieveCfg() {
     if (SPIFFS.exists(CONFIG_FILE)) {
         File file = SPIFFS.open(CONFIG_FILE, FILE_READ);
         if (!file) {
             Serial.println("Failed to open file for reading");
-            return;
+            return false;
         }
         String cfg = file.readString();
         file.close();
         if (cfg.length() > 0) {
             if (radioManager.importCfg(cfg)) {
                 Serial.println("Configuration restored successfully");
+                lastSavedPairedAddrList = radioManager.getPairedAddrList();
+                return true;
             } else {
                 Serial.println("Error while restoring configuration");
+                return false;
             }
         }
     } else {
         Serial.println("No saved configuration found");
+        return false;
     }
+    return false;
 }
 
 void handleButton() {
