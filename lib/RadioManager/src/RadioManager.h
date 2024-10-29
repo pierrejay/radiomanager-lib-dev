@@ -157,8 +157,6 @@ private:
     static const uint8_t HEADER_SIZE = sizeof(PacketHeader);
     static const uint8_t START_CODE = 'M';
     static const uint8_t CONTINUE_CODE = 'C';
-    static const uint8_t END_CODE = 'N';
-    static const uint8_t SINGLE_CODE = 'S';
 
     // Encryption
     mbedtls_entropy_context entropy;

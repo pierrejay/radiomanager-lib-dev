@@ -724,6 +724,7 @@ void RadioManager::handlePairing() {
 void RadioManager::sendData() {
     const uint16_t PAYLOAD_SIZE = MAX_PACKET_SIZE - HEADER_SIZE;
     size_t msgSize = outgoingMsg.size();
+    size_t totalFragments = (msgSize + PAYLOAD_SIZE - 1) / PAYLOAD_SIZE; // Calculate total fragments
 
     if (outgoingMsgIndex < msgSize) {
         size_t remainingSize = msgSize - outgoingMsgIndex;
@@ -732,26 +733,20 @@ void RadioManager::sendData() {
         Bytes packet(MAX_PACKET_SIZE);
         PacketHeader header;
         
-        // Préparer le header
+        // Prepare the header
         if (outgoingMsgIndex == 0) {
-            if (remainingSize <= PAYLOAD_SIZE) {
-                // Single fragment message
-                header.code = SINGLE_CODE;
-            } else {
-                // Start of fragmented message
-                header.code = START_CODE;
-            }
-            header.index = 0;
+            header.code = START_CODE;
+            header.index = totalFragments - 1; // Start with total fragments - 1
         } else {
-            header.code = (remainingSize <= PAYLOAD_SIZE) ? END_CODE : CONTINUE_CODE;
-            header.index = outgoingMsgIndex / PAYLOAD_SIZE;
+            header.code = CONTINUE_CODE;
+            header.index = (remainingSize <= PAYLOAD_SIZE) ? 0 : (totalFragments - 1 - outgoingMsgIndex / PAYLOAD_SIZE);
         }
         
-        // Copier l'en-tête et les données
+        // Copy header and data
         memcpy(packet.data(), &header, HEADER_SIZE);
         memcpy(packet.data() + HEADER_SIZE, &outgoingMsg[outgoingMsgIndex], packetSize);
 
-        // Padder le paquet à 32 bits
+        // Pad the packet to 32 bits
         pad(packet, MAX_PACKET_SIZE);
         
         if (!radio.write(packet.data(), HEADER_SIZE + packetSize)) {
@@ -802,10 +797,10 @@ void RadioManager::receiveData(uint8_t pipe_num) {
         PacketHeader header;
         memcpy(&header, packet.data(), HEADER_SIZE);
         
-        if (header.code == START_CODE || header.code == SINGLE_CODE) {
+        if (header.code == START_CODE) {
             // New message, clear everything that came before
             rxBuffer.clear();
-            expectedFragments = 1;
+            expectedFragments = header.index + 1; // Set expected fragments
             receivedFragments = 0;
         }
         
@@ -816,10 +811,8 @@ void RadioManager::receiveData(uint8_t pipe_num) {
             receivedFragments++;
         }
         
-        // Check if it's the last fragment or a single packet message
-        if (header.code == END_CODE || header.code == SINGLE_CODE) {
-            expectedFragments = (header.code == END_CODE) ? header.index + 1 : 1;
-            
+        // Check if it's the last fragment
+        if (header.index == 0) {
             if (receivedFragments == expectedFragments) {
                 // Process the complete message
                 if (!pairedDevices[channel].addr.isEmpty()) {
