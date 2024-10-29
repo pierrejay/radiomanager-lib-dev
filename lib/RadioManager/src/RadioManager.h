@@ -97,7 +97,6 @@ private:
     void sendData();
 
     // Encryption functions
-    
     Bytes encryptMessage(uint8_t channel, const Bytes& message);
     Bytes decryptMessage(uint8_t channel, const Bytes& encryptedMessage);
     void setDevicePublicKey(uint8_t channel, const uint8_t* newPublicKey);

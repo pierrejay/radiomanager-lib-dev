@@ -7,8 +7,7 @@
 #include <SimpleCha2.h>
 #include <ArduinoJson.h>
 
-
-#define RADIO_MANAGER_DEBUG
+// #define RADIO_MANAGER_DEBUG // Uncomment to enable serial logs
 
 #ifdef RADIO_MANAGER_DEBUG
     #define LOG_(x) Serial.print(x)
@@ -102,7 +101,7 @@ bool RadioManager::begin() {
  */
 void RadioManager::loop() {
     if (!isEnabled) {
-        return;  // Ne rien faire si RadioManager est désactivé
+        return;  // Do nothing if RadioManager is disabled
     }
 
     switch (currentState) {
@@ -140,7 +139,6 @@ void RadioManager::loop() {
 RadioManager::State RadioManager::getCurrentState() {
     return currentState;
 }
-
 
 /**
  * @brief Checks if the RadioManager is busy (pairing, transmitting or receiving)
@@ -204,7 +202,7 @@ Bytes RadioManager::readMsg(uint8_t channel) {
 bool RadioManager::sendMsg(const Bytes& msg, uint8_t channel, uint8_t* status, bool encryption) {
     if (!isEnabled) {
         if (status) *status = -1;
-        return false;  // Ne pas envoyer de message si RadioManager est désactivé
+        return false;  // Do not send message if RadioManager is disabled
     }
 
     if (channel < 0 || channel >= MAX_CHANNELS || pairedDevices[channel].addr.isEmpty()) {
@@ -217,7 +215,7 @@ bool RadioManager::sendMsg(const Bytes& msg, uint8_t channel, uint8_t* status, b
 bool RadioManager::sendMsg(const String& msg, uint8_t channel, uint8_t* status, bool encryption) {
     if (!isEnabled) {
         if (status) *status = -1;
-        return false;  // Ne pas envoyer de message si RadioManager est désactivé
+        return false;  // Do not send message if RadioManager is disabled
     }
 
     Bytes msgBytes(msg.begin(), msg.end());
@@ -236,7 +234,7 @@ bool RadioManager::sendMsg(const String& msg, uint8_t channel, uint8_t* status, 
 bool RadioManager::sendMsgToAddr(const Bytes& msg, const String& targetAddr, uint8_t* status, bool encryption) {
     if (!isEnabled) {
         if (status) *status = -1;
-        return false;  // Ne pas envoyer de message si RadioManager est désactivé
+        return false;  // Do not send message if RadioManager is disabled
     }
 
     if (currentState != IDLE || msg.size() > MAX_MSG_SIZE) {
@@ -291,7 +289,7 @@ bool RadioManager::sendMsgToAddr(const Bytes& msg, const String& targetAddr, uin
 bool RadioManager::sendMsgToAddr(const String& msg, const String& targetAddr, uint8_t* status, bool encryption) {
     if (!isEnabled) {
         if (status) *status = -1;
-        return false;  // Ne pas envoyer de message si RadioManager est désactivé
+        return false;  // Do not send message if RadioManager is disabled
     }
 
     Bytes msgBytes(msg.begin(), msg.end());
@@ -424,7 +422,6 @@ void RadioManager::initRadio() {
     radio.startListening();
 }
 
-
 /**
  * @brief Starts the pairing process
  * 
@@ -432,13 +429,8 @@ void RadioManager::initRadio() {
  */
 bool RadioManager::startPairing() {
     if (!isEnabled) {
-        return false;  // Ne pas démarrer le pairing si RadioManager est désactivé
+        return false;  // Do not start pairing if RadioManager is disabled
     }
-
-    // uint8_t availableChannel = getAvailableChannel();
-    // if (availableChannel == 255) {
-    //     return false;  // All channels are occupied
-    // }
 
     if (currentState == IDLE) {
         currentState = PAIRING_LISTEN;
@@ -901,7 +893,6 @@ bool RadioManager::generateX25519KeyPair(uint8_t* publicKey, uint8_t* privateKey
     return true;
 }
 
-
 /**
  * @brief Destructor for RadioManager
  * Frees allocated resources
@@ -997,7 +988,6 @@ bool RadioManager::setPersonalKeys(const Bytes& publicKey, const Bytes& privateK
     return false;
 }
 
-
 /**
  * @brief Get personal public & private keys (used for shared secret generation)
  * 
@@ -1035,9 +1025,6 @@ bool RadioManager::setPairedKeys(uint8_t channel, const Bytes& publicKey, const 
     }
     return false;
 }
-
-
-
 
 /**
  * @brief Generate X25519 shared key
@@ -1253,16 +1240,20 @@ void RadioManager::enable(bool en) {
     }
 }
 
+/**
+ * @brief Export the current configuration as a JSON string
+ * 
+ * @return The configuration as a JSON string
+ */
 String RadioManager::exportCfg() {
-    DynamicJsonDocument doc(2048);  // Ajustez la taille selon vos besoins
-
-    // Exporter pairedAddr
+    DynamicJsonDocument doc(2048);
+    // Export pairedAddr
     doc["pairedAddr"] = getPairedAddrList();
 
-    // Exporter pairedKeys
+    // Export pairedKeys
     doc["pairedKeys"] = getPairedKeys();
 
-    // Exporter personalKeys
+    // Export personalKeys
     Bytes pubKey, privKey;
     getPersonalKeys(pubKey, privKey);
     doc["personalKeys"]["publicKey"] = Base64::encode(pubKey.data(), pubKey.size());
@@ -1273,15 +1264,21 @@ String RadioManager::exportCfg() {
     return output;
 }
 
+/**
+ * @brief Import the configuration from a JSON string
+ * 
+ * @param jsonConfig The JSON string to import
+ * @return true if the import was successful, false otherwise
+ */
 bool RadioManager::importCfg(const String& jsonConfig) {
-    DynamicJsonDocument doc(2048);  // Ajustez la taille selon vos besoins
+    DynamicJsonDocument doc(2048);
     DeserializationError error = deserializeJson(doc, jsonConfig);
 
     if (error) {
         return false;
     }
 
-    // Importer personalKeys
+    // Import personalKeys
     if (doc.containsKey("personalKeys")) {
         String pubKeyStr = doc["personalKeys"]["publicKey"];
         String privKeyStr = doc["personalKeys"]["privateKey"];
@@ -1291,13 +1288,13 @@ bool RadioManager::importCfg(const String& jsonConfig) {
         setPersonalKeys(pubKey, privKey);
     }
 
-    // Importer pairedAddr
+    // Import pairedAddr
     if (doc.containsKey("pairedAddr")) {
         String pairedAddrList = doc["pairedAddr"].as<String>();
         setPairedAddrList(pairedAddrList);
     }
 
-    // Importer pairedKeys
+    // Import pairedKeys
     if (doc.containsKey("pairedKeys")) {
         JsonObject pairedKeys = doc["pairedKeys"];
         for (JsonPair kv : pairedKeys) {
@@ -1316,8 +1313,13 @@ bool RadioManager::importCfg(const String& jsonConfig) {
     return true;
 }
 
+/**
+ * @brief Get the paired keys as a JSON string
+ * 
+ * @return The paired keys as a JSON string
+ */
 String RadioManager::getPairedKeys() {
-    DynamicJsonDocument doc(1024);  // Ajustez la taille selon vos besoins
+    DynamicJsonDocument doc(1024);
 
     for (uint8_t channel = 0; channel < MAX_CHANNELS; channel++) {
         if (!pairedDevices[channel].addr.isEmpty()) {
