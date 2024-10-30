@@ -12,7 +12,7 @@ The NRF24L01+ is chosen for its cost-effectiveness, reliability, and ease of imp
 - Channels available just above WiFi frequencies, avoiding interference with most WiFi devices and hotspots
 - Unlike LoRa, there is no duty cycle limitation. 
 
-This makes it a cost-effective wireless solution with decent data rates, capable of streaming data at several hundred kb/s. 
+This makes it a cost-effective wireless solution with decent data rates, capable of streaming data at several hundred kbps. 
 With encryption, it becomes a powerful tool for industrial contexts and embedded applications.
 Many "packaged" modules are available at a retail price of 5-10€, such as EBYTE E01-ML01DP5 or E01-2G4M27D with embedded power amplifier, used to test the library with success.
 
@@ -22,7 +22,7 @@ The RadioManager library currently allows to easily implement communication capa
 
 ### Encryption Approach
 
-The encryption approach is pragmatic, based on end-to-end encryption using a shared key established during pairing. The aim is to implement basic security measures in order to prevent eavesdropping and impersonation (even without knowing the key, an attacker could replay a message to execute an action at will if communicating with an industrial equipment for example). No serious measures are implemented to prevent an attacker from having access to the hardware (no secure element, keys stored in plain text in memory), but as long as hardware remains physically safe, communication should remain secure and only vulnerable to jamming.
+The encryption approach is pragmatic, based on end-to-end encryption using a shared secret established between two nodes during the pairing process. The aim is to implement basic security measures in order to prevent eavesdropping and impersonation (even without knowing the key, an attacker could replay a message to execute an action at will if communicating with an industrial equipment for example). No serious measures are implemented to prevent the consequences of an attacker getting access to the hardware (no secure element, keys stored in plain text in memory), but as long as hardware remains physically safe, communication should remain secure and only vulnerable to jamming.
 
 ### Future Plans
 
