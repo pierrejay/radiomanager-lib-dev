@@ -49,7 +49,6 @@ void setup() {
     // Restore configuration after reboot
     if (!retrieveCfg()) {
         Serial.println("Failed to retrieve configuration, using default settings");
-        // Vous pouvez ajouter ici un code pour gérer l'échec de la récupération de la configuration
     }
 }
 
