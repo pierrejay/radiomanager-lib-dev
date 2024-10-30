@@ -171,6 +171,135 @@ void loop() {
 }
 ```
 
+## Full API Reference
+
+### Constructor
+
+```cpp
+RadioManager(uint8_t ce_pin, uint8_t csn_pin, const char* radio_id)
+```
+
+Initializes a new RadioManager instance.
+- `ce_pin`: CE pin for the nRF24L01 module
+- `csn_pin`: CSN pin for the nRF24L01 module
+- `radio_id`: Unique identifier for this radio (will be trimmed to 4 characters)
+
+### Core Methods
+
+#### begin()
+```cpp
+bool begin()
+```
+Initializes the radio module and configures initial parameters.
+- **Returns**: `true` if initialization was successful, `false` otherwise
+
+#### loop()
+```cpp
+void loop()
+```
+Main function to be called frequently in the program's main loop. Manages the different states of the RadioManager.
+
+#### sendMsg()
+```cpp
+bool sendMsg(const Bytes& msg, uint8_t channel, uint8_t* status = nullptr, bool encryption = false)
+```
+Sends a message on a specific channel.
+- `msg`: The message to send
+- `channel`: The channel number (0-4)
+- `status`: Optional pointer to track sending progress (0=in progress, -1=error, 1=success)
+- `encryption`: Whether to encrypt the message
+- **Returns**: `true` if sending was initiated successfully, `false` otherwise
+
+#### readMsg()
+```cpp
+Bytes readMsg(uint8_t channel)
+```
+Reads an available message from a specific channel.
+- `channel`: The channel number to read from (0-4)
+- **Returns**: The message as a vector of bytes, or empty vector if no message available
+
+### Pairing Management
+
+#### startPairing()
+```cpp
+bool startPairing()
+```
+Initiates the secure pairing process with another device.
+- **Returns**: `true` if pairing process started successfully, `false` otherwise
+
+#### getPairedAddr()
+```cpp
+String getPairedAddr(uint8_t channel)
+```
+Gets the address of a paired device on a specific channel.
+- `channel`: The channel number (0-4)
+- **Returns**: The address of the paired device, or empty string if no device is paired
+
+## 🔄 States
+
+The RadioManager can be in one of the following states:
+
+|
+ State 
+|
+ Description 
+|
+|
+-------
+|
+-------------
+|
+|
+`IDLE`
+|
+ Ready to send/receive messages 
+|
+|
+`TRANSMITTING`
+|
+ Currently sending a message 
+|
+|
+`RECEIVING`
+|
+ Currently receiving a message 
+|
+|
+`PAIRING_LISTEN`
+|
+ Listening for pairing requests 
+|
+|
+`PAIRING_TRANSMIT`
+|
+ Transmitting pairing information 
+|
+
+### State Query Methods
+
+```cpp
+State getCurrentState()  // Returns current state
+bool isBusy()           // Returns true if radio is busy
+bool isAvailable()      // Returns true if radio is available
+```
+
+## ⚡ Configuration Management
+
+### exportCfg()
+```cpp
+String exportCfg()
+```
+Exports the current configuration as a JSON string, including paired devices and encryption keys.
+- **Returns**: Configuration as JSON string
+
+### importCfg()
+```cpp
+bool importCfg(const String& jsonConfig)
+```
+Imports configuration from a JSON string.
+- `jsonConfig`: JSON string containing configuration
+- **Returns**: `true` if import was successful, `false` otherwise
+
 ### Debugging
 You can enable detailed logs for troubleshooting by setting the flag `RADIO_MANAGER_DEBUG` in the `.cpp` file. This will activate verbose output, helping you to monitor the internal operations of the library during development.
 

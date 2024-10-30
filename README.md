@@ -16,11 +16,11 @@ Many "packaged" modules are available at a retail price of 5-10€, such as EBYT
 
 ### Current Capabilities
 
-The RadioManager library currently allows to easily implement communication capabilities with up to 5 other nodes in a point-to-point manner, with fully automatic pairing management and a user-friendly API for sending and receiving messages.
+The RadioManager library currently allows to easily implement communication capabilities with up to 5 other nodes in a point-to-point manner, with fully automatic pairing management and a user-friendly API for sending and receiving messages. The main.cpp file is a basic example that sets up a node with a unique ID (obtained from the ESP32 Mac address) and allows to pair with another node using a button. It transmits every message received on the Serial port to the 1st paired node in its list, and displays every message received on the Serial port. It also manages saving and restoring the configuration (list of paired nodes and their keys) from a file on the ESP32 Flash memory (SPIFFS) which could be integrated into the library at some point.
 
 ### Encryption Approach
 
-The encryption approach is pragmatic, based on end-to-end encryption using a shared key established during pairing. The aim is to prevent eavesdropping and impersonation (even without knowing the key, an attacker could replay a message to execute an action at will if communicating with an industrial equipment for example). As long as the attacker does not have access to the hardware, communication shoud remain secure and only vulnerable to jamming.
+The encryption approach is pragmatic, based on end-to-end encryption using a shared key established during pairing. The aim is to implement basic security measures in order to prevent eavesdropping and impersonation (even without knowing the key, an attacker could replay a message to execute an action at will if communicating with an industrial equipment for example). No serious measures are implemented to prevent an attacker from having access to the hardware (no secure element, keys stored in plain text in memory), but as long as hardware remains physically safe, communication should remain secure and only vulnerable to jamming.
 
 ### Future Plans
 
