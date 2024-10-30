@@ -255,7 +255,7 @@ bool isBusy()           // Returns true if radio is busy
 bool isAvailable()      // Returns true if radio is available
 ```
 
-## ⚡ Configuration Management
+## Configuration Management
 
 ### exportCfg()
 ```cpp
