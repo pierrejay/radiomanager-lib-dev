@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RadioManager Library Documentation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f8f9fa;
+            color: #3b4151;
+        }
+        .swagger-ui {
+            max-width: 1460px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .info {
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info h1 {
+            font-size: 36px;
+            margin: 0;
+            color: #3b4151;
+        }
+        .section {
+            margin: 30px 0;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        .section h2 {
+            color: #3b4151;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .endpoint {
+            margin: 20px 0;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .member {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+        .member-type {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        .constructor { background: #9012fe; color: white; }
+        .method { background: #49cc90; color: white; }
+        .private-method { background: #d94848; color: white; }
+        .property { background: #61affe; color: white; }
+        .event { background: #f0ad4e; color: white; }
+        .path {
+            font-size: 16px;
+            font-family: monospace;
+        }
+        .description {
+            padding: 15px;
+            background: #fafafa;
+            border-top: 1px solid #eee;
+            display: none;
+        }
+        .endpoint.active .description {
+            display: block;
+        }
+        .parameters {
+            margin-top: 10px;
+        }
+        .parameter {
+            padding: 5px 0;
+        }
+        .required {
+            color: #ff0000;
+            margin-left: 5px;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 13px;
+            color: #333;
+            overflow-x: auto;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #e83e8c;
+        }
+        h4 {
+            color: #3b4151;
+            font-size: 16px;
+            margin: 15px 0 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="swagger-ui">
+        <div class="info">
+            <h1>RadioManager Library Documentation</h1>
+            <p>Documentation for the RadioManager library and its dependencies</p>
+        </div>
+
+        <!-- Section RadioManager -->
+        <div class="section">
+            <h2>RadioManager Class</h2>
+
+            <!-- Public Functions -->
+            <div class="section">
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type constructor">CONSTRUCTOR</span>
+                        <span class="path">RadioManager(uint8_t ce_pin, uint8_t csn_pin, const char* radio_id)</span>
+                    </div>
+                    <div class="description">
+                        <p>Creates a new RadioManager instance.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>ce_pin</code> - CE pin for the nRF24L01 module<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>csn_pin</code> - CSN pin for the nRF24L01 module<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>radio_id</code> - Unique identifier for this radio (will be trimmed to 4 characters)<span class="required">*required</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Public Functions</h2>
+                <h3>Operations</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool begin()</span>
+                    </div>
+                    <div class="description">
+                        <p>Initializes the radio module and configures initial parameters.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>true if initialization was successful, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">void loop()</span>
+                    </div>
+                    <div class="description">
+                        <p>Main function to be called frequently in the program's main loop. Manages the different states of the RadioManager.</p>
+                        <div class="parameters">
+                            <h4>States:</h4>
+                            <pre>
+IDLE           - Ready to send/receive messages
+TRANSMITTING   - Currently sending a message
+RECEIVING      - Currently receiving a message
+PAIRING_LISTEN - Listening for pairing requests
+PAIRING_TRANSMIT - Transmitting pairing information</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">State getCurrentState()</span>
+                    </div>
+                    <div class="description">
+                        <p>Gets the current state of the RadioManager.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>The current state of the RadioManager</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool isBusy()</span>
+                    </div>
+                    <div class="description">
+                        <p>Checks if the RadioManager is busy (pairing, transmitting or receiving).</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>true if the RadioManager is busy, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool isAvailable()</span>
+                    </div>
+                    <div class="description">
+                        <p>Checks if the RadioManager is available for operations.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>true if the RadioManager is available, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">String getRadioID()</span>
+                    </div>
+                    <div class="description">
+                        <p>Gets the radio module ID.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>The radio module ID as a String</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool startPairing()</span>
+                    </div>
+                    <div class="description">
+                        <p>Initiates the secure pairing process with another device.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>true if pairing process started successfully, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">void enable(bool en)</span>
+                    </div>
+                    <div class="description">
+                        <p>Enable/disable radio operation.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>en</code> - Target state (false=off, true=on)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3>Messages</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">uint8_t isMsgAvailable(uint8_t channel)</span>
+                    </div>
+                    <div class="description">
+                        <p>Checks the number of messages available on a specific channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number to check
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>The number of messages available on the specified channel</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">Bytes readMsg(uint8_t channel)</span>
+                    </div>
+                    <div class="description">
+                        <p>Reads an available message on a specific channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number to read from
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>The read message as a vector of uint8_t, or an empty vector if no message is available</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool sendMsg(const Bytes& msg, uint8_t channel, uint8_t* status = nullptr, bool encryption = false)</span>
+                    </div>
+                    <div class="description">
+                        <p>Sends a message on a specific channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>msg</code> - The message to send<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number (0-4)<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>status</code> - Optional pointer to track sending progress (0=in progress, -1=error, 1=success)
+                            </div>
+                            <div class="parameter">
+                                <code>encryption</code> - Whether to encrypt the message (default: false)
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if sending was initiated successfully, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool sendMsg(const String& msg, uint8_t channel, uint8_t* status = nullptr, bool encryption = false)</span>
+                    </div>
+                    <div class="description">
+                        <p>Sends a message on a specific channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>msg</code> - The message to send<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number (0-4)<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>status</code> - Optional pointer to track sending progress (0=in progress, -1=error, 1=success)
+                            </div>
+                            <div class="parameter">
+                                <code>encryption</code> - Whether to encrypt the message (default: false)
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if sending was initiated successfully, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool sendMsgToAddr(const Bytes& msg, const String& targetAddr, uint8_t* status = nullptr, bool encryption = false)</span>
+                    </div>
+                    <div class="description">
+                        <p>Sends a message to a specific device identified by its Addr.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>msg</code> - The message to send<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>targetAddr</code> - The Addr of the target device<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>status</code> - Optional pointer to track sending progress (0=in progress, -1=error, 1=success)
+                            </div>
+                            <div class="parameter">
+                                <code>encryption</code> - Whether to encrypt the message (default: false)
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if sending was initiated successfully, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool sendMsgToAddr(const String& msg, const String& targetAddr, uint8_t* status = nullptr, bool encryption = false)</span>
+                    </div>
+                    <div class="description">
+                        <p>Sends a message to a specific device identified by its Addr.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>msg</code> - The message to send<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>targetAddr</code> - The Addr of the target device<span class="required">*required</span>
+                            </div>
+                            <div class="parameter">
+                                <code>status</code> - Optional pointer to track sending progress (0=in progress, -1=error, 1=success)
+                            </div>
+                            <div class="parameter">
+                                <code>encryption</code> - Whether to encrypt the message (default: false)
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if sending was initiated successfully, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">void clearMessages(uint8_t channel)</span>
+                    </div>
+                    <div class="description">
+                        <p>Clear all messages in inbox.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - Channel number
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3>Pairing</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">uint8_t getAvailableChannel()</span>
+                    </div>
+                    <div class="description">
+                        <p>Gets the first available channel for pairing.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>The number of the first available channel, or 255 if no channel is available</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">String getPairedAddr(uint8_t channel)</span>
+                    </div>
+                    <div class="description">
+                        <p>Gets the Addr of the paired device on a specific channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>The Addr of the paired device, or an empty string if no device is paired on this channel</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">String getPairedUID(uint8_t channel)</span>
+                    </div>
+                    <div class="description">
+                        <p>Gets the UID of the paired device on a specific channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>The UID of the paired device, or an empty string if no device is paired on this channel</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">uint8_t getPairedChannel(String& uid)</span>
+                    </div>
+                    <div class="description">
+                        <p>Gets the pairing channel of a given UID (if it is paired).</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>uid</code> - The searched 4-character UID
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>The pairing channel of the searched UID, or 255 if UID was not found</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool setPairedAddr(String& address, uint8_t channel)</span>
+                    </div>
+                    <div class="description">
+                        <p>Sets the Addr of a paired device on a specific channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>address</code> - The Addr to set
+                            </div>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if the operation was successful, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool setPairedAddr(String& address, uint8_t channel, uint8_t* publicKey, uint8_t* sharedKey)</span>
+                    </div>
+                    <div class="description">
+                        <p>Sets the Addr of a paired device on a specific channel including encryption keys.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>address</code> - The Addr to set
+                            </div>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number
+                            </div>
+                            <div class="parameter">
+                                <code>publicKey</code> - Pointer to public key (32 bytes)
+                            </div>
+                            <div class="parameter">
+                                <code>sharedKey</code> - Pointer to shared key (32 bytes)
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if the operation was successful, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">void clearPairedAddr(uint8_t channel)</span>
+                    </div>
+                    <div class="description">
+                        <p>Clears the Addr of a paired device on a specific channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number to clear
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool clearPairedUID(String& uid)</span>
+                    </div>
+                    <div class="description">
+                        <p>Check if UID exists in paired devices and unpair corresponding address.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>uid</code> - The 4-character UID to be unpaired
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if an address was unpaired, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">String getPairedAddrList()</span>
+                    </div>
+                    <div class="description">
+                        <p>Gets the list of paired Addrs as a string.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>A string containing the list of paired Addrs, separated by commas. "0" represents an unpaired channel.</pre>
+                        </div>
+                    </div>
+                </div>
+                <h3>Keys management</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool setPairedAddrList(const String& addrList)</span>
+                    </div>
+                    <div class="description">
+                        <p>Sets the list of paired Addrs from a string.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>addrList</code> - A string containing the list of Addrs to set, separated by commas. "0" represents an unpaired channel.
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if the operation was successful, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool setPersonalKeys(const Bytes& publicKey, const Bytes& privateKey)</span>
+                    </div>
+                    <div class="description">
+                        <p>Set personal public & private key (used for shared secret gen).</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>publicKey</code> - Reference to vector containing pub key
+                            </div>
+                            <div class="parameter">
+                                <code>privateKey</code> - Reference to vector containing private key
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>True if keys set, false if invalid key(s)</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">void getPersonalKeys(Bytes& publicKey, Bytes& privateKey)</span>
+                    </div>
+                    <div class="description">
+                        <p>Get personal public & private keys (used for shared secret generation).</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>publicKey</code> - Reference to vector to store the public key
+                            </div>
+                            <div class="parameter">
+                                <code>privateKey</code> - Reference to vector to store the private key
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">String getPairedKeys()</span>
+                    </div>
+                    <div class="description">
+                        <p>Get the paired keys as a JSON string.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>The paired keys as a JSON string</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool setPairedKeys(uint8_t channel, const Bytes& publicKey, const Bytes& sharedKey)</span>
+                    </div>
+                    <div class="description">
+                        <p>Set paired channel public & shared keys (used for pairing & E2EE).</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - Pairing channel
+                            </div>
+                            <div class="parameter">
+                                <code>publicKey</code> - Reference to vector containing pub key
+                            </div>
+                            <div class="parameter">
+                                <code>sharedKey</code> - Reference to vector containing shared key
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>True if keys set, false if invalid key(s)</pre>
+                        </div>
+                    </div>
+                </div>
+                <h3>Configuration</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">String exportCfg()</span>
+                    </div>
+                    <div class="description">
+                        <p>Export the current configuration as a JSON string.</p>
+                        <div class="parameters">
+                            <h4>Returns:</h4>
+                            <pre>The configuration as a JSON string</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type method">PUBLIC</span>
+                        <span class="path">bool importCfg(const String& jsonConfig)</span>
+                    </div>
+                    <div class="description">
+                        <p>Import the configuration from a JSON string.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>jsonConfig</code> - The JSON string to import
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if the import was successful, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Private Functions -->
+            <div class="section">
+                <h2>Private Functions</h2>
+                <h3>Utility</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">bool checkValidAddr(String& addr)</span>
+                    </div>
+                    <div class="description">
+                        <p>Check validity of a given address.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>addr</code> - The address to be checked
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if the address is valid, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">void pad(Bytes& payload, size_t paddingSize)</span>
+                    </div>
+                    <div class="description">
+                        <p>Add padding to message (fill with 0s).</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>payload</code> - Reference to payload vector
+                            </div>
+                            <div class="parameter">
+                                <code>paddingSize</code> - Padding size in bytes
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">void unpad(Bytes& payload)</span>
+                    </div>
+                    <div class="description">
+                        <p>Remove padding from message (end 0s).</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>payload</code> - Reference to payload vector
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3>Radio</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">void initRadio()</span>
+                    </div>
+                    <div class="description">
+                        <p>Initializes the radio module parameters.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">void handlePairing()</span>
+                    </div>
+                    <div class="description">
+                        <p>Handles the async pairing procedure.</p>
+                    </div>
+                </div>
+                <h3>Configuration management</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">void receiveData(uint8_t pipe_num)</span>
+                    </div>
+                    <div class="description">
+                        <p>Process incoming data & manage reassembly of long payloads.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>pipe_num</code> - The channel number on which to receive data
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h3>Encryption</h3>
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">void sendData()</span>
+                    </div>
+                    <div class="description">
+                        <p>Process sending data & manage fragmentation of long payloads.</p>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">Bytes encryptMessage(uint8_t channel, const Bytes& message)</span>
+                    </div>
+                    <div class="description">
+                        <p>Encrypt a message using the chaObject of the specified channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number to use for encryption
+                            </div>
+                            <div class="parameter">
+                                <code>message</code> - The message to encrypt
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>The encrypted message as a vector of bytes, or an empty vector if encryption fails</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">Bytes decryptMessage(uint8_t channel, const Bytes& encryptedMessage)</span>
+                    </div>
+                    <div class="description">
+                        <p>Decrypt a message using the chaObject of the specified channel.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number to use for decryption
+                            </div>
+                            <div class="parameter">
+                                <code>encryptedMessage</code> - The encrypted message to decrypt
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>The decrypted message as a vector of bytes, or an empty vector if decryption fails</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">void setDevicePublicKey(uint8_t channel, const uint8_t* newPublicKey)</span>
+                    </div>
+                    <div class="description">
+                        <p>Set the public key for a paired device.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number of the paired device
+                            </div>
+                            <div class="parameter">
+                                <code>newPublicKey</code> - Pointer to the new public key
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">void setDeviceSharedKey(uint8_t channel, const uint8_t* newSharedKey)</span>
+                    </div>
+                    <div class="description">
+                        <p>Set the shared key for a paired device and update the chaObject.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>channel</code> - The channel number of the paired device
+                            </div>
+                            <div class="parameter">
+                                <code>newSharedKey</code> - Pointer to the new shared key
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">bool generateX25519KeyPair(uint8_t* publicKey, uint8_t* privateKey)</span>
+                    </div>
+                    <div class="description">
+                        <p>Generates an X25519 key pair.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>publicKey</code> - Pointer to store the generated public key
+                            </div>
+                            <div class="parameter">
+                                <code>privateKey</code> - Pointer to store the generated private key
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if generation was successful, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="member">
+                        <span class="member-type private-method">PRIVATE</span>
+                        <span class="path">bool generateX25519SharedKey(const uint8_t* peerPublicKey, const uint8_t* privateKey, uint8_t* sharedKey)</span>
+                    </div>
+                    <div class="description">
+                        <p>Generate X25519 shared key.</p>
+                        <div class="parameters">
+                            <h4>Parameters:</h4>
+                            <div class="parameter">
+                                <code>peerPublicKey</code> - Pointer to peer public key (KEY_SIZE)
+                            </div>
+                            <div class="parameter">
+                                <code>privateKey</code> - Pointer to own private key (KEY_SIZE)
+                            </div>
+                            <div class="parameter">
+                                <code>sharedKey</code> - Pointer to generated shared key (KEY_SIZE)
+                            </div>
+                            <h4>Returns:</h4>
+                            <pre>true if the key was generated, false otherwise</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.member').forEach(member => {
+            member.addEventListener('click', () => {
+                const endpoint = member.parentElement;
+                endpoint.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html> 
