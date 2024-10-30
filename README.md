@@ -14,7 +14,7 @@ The NRF24L01+ is chosen for its cost-effectiveness, reliability, and ease of imp
 
 This makes it a cost-effective wireless solution with decent data rates, capable of streaming data at several hundred kb/s. 
 With encryption, it becomes a powerful tool for industrial contexts and embedded applications.
-Many "packaged" modules are available at a retail price of 5-10€, such as EBYTE E01-ML01DP5 or E01-2G4M27D with embedde power amplifier.
+Many "packaged" modules are available at a retail price of 5-10€, such as EBYTE E01-ML01DP5 or E01-2G4M27D with embedded power amplifier, used to test the library with success.
 
 ### Current Capabilities
 
@@ -26,7 +26,7 @@ The encryption approach is pragmatic, based on end-to-end encryption using a sha
 
 ### Future Plans
 
-In the next steps, I plan to enhance the RF24Mesh library to integrate these features (UID-based addressing, dynamic pairing, and encryption) for an even more practical solution (automatic formation and reconfiguration of a mesh network with up to 200+ nodes).
+In the next steps, I plan to enhance the RF24Mesh library to integrate these features (UID-based addressing, dynamic pairing, and encryption) for an even more powerful solution (automatic formation and reconfiguration of a mesh network with up to 200+ nodes). To limit the complexity of managing end-to-end encryption between all nodes (with list of keys maintained locally on each device), a unique shared key managed by the master node could be used to encrypt all regular point-to-point communications within the same mesh.
 
 ### Further Details
 
