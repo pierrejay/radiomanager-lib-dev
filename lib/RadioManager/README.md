@@ -235,45 +235,17 @@ Gets the address of a paired device on a specific channel.
 - `channel`: The channel number (0-4)
 - **Returns**: The address of the paired device, or empty string if no device is paired
 
-## 🔄 States
+## States
 
 The RadioManager can be in one of the following states:
 
-|
- State 
-|
- Description 
-|
-|
--------
-|
--------------
-|
-|
-`IDLE`
-|
- Ready to send/receive messages 
-|
-|
-`TRANSMITTING`
-|
- Currently sending a message 
-|
-|
-`RECEIVING`
-|
- Currently receiving a message 
-|
-|
-`PAIRING_LISTEN`
-|
- Listening for pairing requests 
-|
-|
-`PAIRING_TRANSMIT`
-|
- Transmitting pairing information 
-|
+| State | Description |
+|-------|-------------|
+|`IDLE`| Ready to send/receive messages|
+|`TRANSMITTING`| Currently sending a message |
+|`RECEIVING`| Currently receiving a message |
+|`PAIRING_LISTEN`| Listening for pairing requests |
+|`PAIRING_TRANSMIT`| Transmitting pairing information |
 
 ### State Query Methods
 
