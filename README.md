@@ -11,7 +11,9 @@ The NRF24L01+ is chosen for its cost-effectiveness, reliability, and ease of imp
 - Minimal regulatory constraints allowing transmission up to 100 mW for ranges of several hundred meters to several kilometers with the right antenna
 - Channels available just above WiFi frequencies, avoiding interference with most WiFi devices and hotspots
 - Unlike LoRa, there is no duty cycle limitation. 
-This makes it a cost-effective wireless solution with decent data rates, capable of streaming data at several hundred kb/s. With encryption, it becomes a powerful tool for industrial contexts and embedded applications.
+
+This makes it a cost-effective wireless solution with decent data rates, capable of streaming data at several hundred kb/s. 
+With encryption, it becomes a powerful tool for industrial contexts and embedded applications.
 Many "packaged" modules are available at a retail price of 5-10€, such as EBYTE E01-ML01DP5 or E01-2G4M27D with embedde power amplifier.
 
 ### Current Capabilities
