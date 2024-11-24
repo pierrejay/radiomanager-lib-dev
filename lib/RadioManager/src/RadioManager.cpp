@@ -868,46 +868,6 @@ void RadioManager::receiveData(uint8_t pipe_num) {
 }
 
 /**
- * @brief Generates an X25519 key pair
- * 
- * @return true if generation was successful, false otherwise
- */
-bool RadioManager::generateX25519KeyPair(uint8_t* publicKey, uint8_t* privateKey) {
-    mbedtls_ecdh_context ctx;
-    mbedtls_ecdh_init(&ctx);
-
-    int ret = mbedtls_ecp_group_load(&ctx.grp, MBEDTLS_ECP_DP_CURVE25519);
-    if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
-    }
-
-    ret = mbedtls_ecdh_gen_public(&ctx.grp, &ctx.d, &ctx.Q,
-                                  mbedtls_ctr_drbg_random, &ctr_drbg);
-    if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
-    }
-
-    size_t olen;
-    ret = mbedtls_ecp_point_write_binary(&ctx.grp, &ctx.Q, MBEDTLS_ECP_PF_COMPRESSED,
-                                         &olen, publicKey, KEY_SIZE);
-    if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
-    }
-
-    ret = mbedtls_mpi_write_binary(&ctx.d, privateKey, KEY_SIZE);
-    if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
-    }
-
-    mbedtls_ecdh_free(&ctx);
-    return true;
-}
-
-/**
  * @brief Destructor for RadioManager
  * Frees allocated resources
  */
@@ -1035,6 +995,53 @@ bool RadioManager::setPairedDeviceKeys(uint8_t channel, const Bytes& publicKey) 
 }
 
 /**
+ * @brief Generates an X25519 key pair
+ * 
+ * @return true if generation was successful, false otherwise
+ */
+bool RadioManager::generateX25519KeyPair(uint8_t* publicKey, uint8_t* privateKey) {
+    mbedtls_ecp_group grp;
+    mbedtls_ecp_point Q;
+    mbedtls_mpi d;
+
+    // Initialize structures
+    mbedtls_ecp_group_init(&grp);
+    mbedtls_ecp_point_init(&Q);
+    mbedtls_mpi_init(&d);
+
+    // Load the curve
+    int ret = mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_CURVE25519);
+    if (ret != 0) {
+        goto cleanup;
+    }
+
+    // Generate key pair
+    ret = mbedtls_ecp_gen_keypair(&grp, &d, &Q, 
+                                 mbedtls_ctr_drbg_random, &ctr_drbg);
+    if (ret != 0) {
+        goto cleanup;
+    }
+
+    // Export public key
+    size_t olen;
+    ret = mbedtls_ecp_point_write_binary(&grp, &Q, MBEDTLS_ECP_PF_COMPRESSED,
+                                        &olen, publicKey, KEY_SIZE);
+    if (ret != 0) {
+        goto cleanup;
+    }
+
+    // Export private key
+    ret = mbedtls_mpi_write_binary(&d, privateKey, KEY_SIZE);
+
+cleanup:
+    mbedtls_ecp_group_free(&grp);
+    mbedtls_ecp_point_free(&Q);
+    mbedtls_mpi_free(&d);
+
+    return ret == 0;
+}
+
+/**
  * @brief Generate X25519 shared key
  * 
  * @param peerPublicKey Pointer to peer public key (KEY_SIZE)
@@ -1043,42 +1050,52 @@ bool RadioManager::setPairedDeviceKeys(uint8_t channel, const Bytes& publicKey) 
  * @return true if the key was generated, false otherwise
  */
 bool RadioManager::generateX25519SharedKey(const uint8_t* peerPublicKey, const uint8_t* privateKey, uint8_t* sharedKey) {
-    mbedtls_ecdh_context ctx;
-    mbedtls_ecdh_init(&ctx);
+    mbedtls_ecp_group grp;
+    mbedtls_ecp_point Q;
+    mbedtls_mpi d;
+    mbedtls_mpi z;
 
-    int ret = mbedtls_ecp_group_load(&ctx.grp, MBEDTLS_ECP_DP_CURVE25519);
+    // Initialize structures
+    mbedtls_ecp_group_init(&grp);
+    mbedtls_ecp_point_init(&Q);
+    mbedtls_mpi_init(&d);
+    mbedtls_mpi_init(&z);
+
+    // Load the curve
+    int ret = mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_CURVE25519);
     if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
+        goto cleanup;
     }
 
-    ret = mbedtls_mpi_read_binary(&ctx.d, privateKey, KEY_SIZE);
+    // Import private key
+    ret = mbedtls_mpi_read_binary(&d, privateKey, KEY_SIZE);
     if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
+        goto cleanup;
     }
 
-    ret = mbedtls_ecp_point_read_binary(&ctx.grp, &ctx.Qp, peerPublicKey, KEY_SIZE);
+    // Import peer's public key
+    ret = mbedtls_ecp_point_read_binary(&grp, &Q, peerPublicKey, KEY_SIZE);
     if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
+        goto cleanup;
     }
 
-    ret = mbedtls_ecdh_compute_shared(&ctx.grp, &ctx.z, &ctx.Qp, &ctx.d,
-                                      mbedtls_ctr_drbg_random, &ctr_drbg);
+    // Compute shared secret
+    ret = mbedtls_ecdh_compute_shared(&grp, &z, &Q, &d,
+                                     mbedtls_ctr_drbg_random, &ctr_drbg);
     if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
+        goto cleanup;
     }
 
-    ret = mbedtls_mpi_write_binary(&ctx.z, sharedKey, KEY_SIZE);
-    if (ret != 0) {
-        mbedtls_ecdh_free(&ctx);
-        return false;
-    }
+    // Export shared secret
+    ret = mbedtls_mpi_write_binary(&z, sharedKey, KEY_SIZE);
 
-    mbedtls_ecdh_free(&ctx);
-    return true;
+cleanup:
+    mbedtls_ecp_group_free(&grp);
+    mbedtls_ecp_point_free(&Q);
+    mbedtls_mpi_free(&d);
+    mbedtls_mpi_free(&z);
+
+    return ret == 0;
 }
 
 /**

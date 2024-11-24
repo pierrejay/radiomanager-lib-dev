@@ -3,7 +3,9 @@
 
 #include <Arduino.h>
 #include <SPIFFS.h>
+#include <esp_system.h>
 #include "RadioManager.h"
+#include "esp_mac.h"
 
 #define BUTTON_PIN D1
 
