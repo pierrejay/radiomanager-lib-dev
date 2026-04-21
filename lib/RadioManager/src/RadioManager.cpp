@@ -393,6 +393,28 @@ bool RadioManager::setPairedAddr(String& address, uint8_t channel, Bytes& public
 }
 
 /**
+ * @brief Provisions a paired device with a pre-shared symmetric key (static pairing)
+ *
+ * Bypasses the X25519 key exchange — the caller provides a 32-byte shared secret
+ * that will be used directly for ChaCha20 on this channel. The receiving peer must
+ * hold the SAME 32-byte key and know this device's listening address.
+ *
+ * @param address   Peer's listening address (channel digit + 4-char UID, e.g. "0RMTE")
+ * @param channel   Local channel number (0..MAX_CHANNELS-1)
+ * @param sharedKey Pointer to a 32-byte symmetric key (must remain valid for the call)
+ * @return true on success, false on invalid arguments
+ */
+bool RadioManager::setStaticPairing(const String& address, uint8_t channel, const uint8_t* sharedKey) {
+    if (channel >= MAX_CHANNELS || sharedKey == nullptr) return false;
+
+    clearPairedAddr(channel);
+    pairedDevices[channel].addr = address;
+    setDeviceSharedKey(channel, sharedKey);
+    radio.openReadingPipe(channel + 1, (uint8_t*)(String(channel) + radioID).c_str());
+    return true;
+}
+
+/**
  * @brief Clears the Addr of a paired device on a specific channel
  * 
  * @param channel The channel number to clear

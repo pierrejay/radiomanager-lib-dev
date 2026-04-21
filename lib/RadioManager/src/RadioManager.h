@@ -65,6 +65,11 @@ public:
     bool setPairedAddr(String& address, uint8_t channel);
     bool setPairedAddr(String& address, uint8_t channel, uint8_t* publicKey);
     bool setPairedAddr(String& address, uint8_t channel, Bytes& publicKey);
+    // Provision a paired device using a pre-shared 32-byte symmetric key,
+    // bypassing X25519 key exchange entirely. Intended for static deployments
+    // where both ends ship with the same shared secret baked in — avoids the
+    // runtime pairing dance and survives reboots without persistence.
+    bool setStaticPairing(const String& address, uint8_t channel, const uint8_t* sharedKey);
     void clearPairedAddr(uint8_t channel);
     bool clearPairedUID(String& uid);
 
